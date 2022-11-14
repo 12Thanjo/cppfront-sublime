@@ -1,0 +1,607 @@
+%YAML 1.2
+---
+# The MIT License (MIT)
+#
+# Copyright (c) 2022
+# 12Thanjo (Andrew Feldman)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# Some of this syntax definition is based on the default C/C++ syntax definitions
+# that came with Sublime Text v.4141 (Dev Channel)
+#
+#
+
+
+name: cppfront
+file_extensions:
+  - cpp2
+scope: source.cpp2
+
+variables:
+  identifier: \b[A-Za-z|_][A-Za-z0-9|_]*\b
+  namespace_identifier: '({{identifier}}::)*'
+
+  newline: '[^\\](\r\n|\n|\r|\n\r)'
+
+
+  
+  # types
+  numeric_type: 'int|float|double|short|long|_Complex|_Imaginary'
+  asm_type:     'asm|__asm__'
+  boolean_type: 'bool|_Bool'
+  misc_type:    'void|auto'
+
+  built_in_type: '({{numeric_type}}|{{asm_type}}|{{boolean_type}}|{{misc_type}})'
+
+
+  bin_digit: '[01'']'
+  oct_digit: '[0-7'']'
+  dec_digit: '[\d'']'
+  hex_digit: '[\h'']'
+
+  dec_digits: '(?:\d(?:{{dec_digit}}*\d)?)'
+
+  dec_exponent: '(?:[eE][-+]?{{dec_digit}}*)'
+  hex_exponent: '(?:[pP][-+]?{{dec_digit}}*)'
+
+  bin_suffix: '[2-9a-zA-Z_][[:alnum:]_]*'
+  oct_suffix: '[8-9g-zG-Z_][[:alnum:]_]*'
+  dec_suffix: '[a-zA-Z_][[:alnum:]_]*'
+  hex_suffix: '[g-zG-Z_][[:alnum:]_]*'
+  float_suffix: '[fF]'
+
+  microsoft_types: '\b(__int8|__int16|__int32|__int64)\b'
+  windows_types: '\b(APIENTRY|ATOM|BOOL|BOOLEAN|BYTE|CALLBACK|CCHAR|CHAR|COLORREF|CONST|DWORD|DWORDLONG|DWORD_PTR|DWORD32|DWORD64|FLOAT|HACCEL|HALF_PTR|HANDLE|HBITMAP|HBRUSH|HCOLORSPACE|HCONV|HCONVLIST|HCURSOR|HDC|HDDEDATA|HDESK|HDROP|HDWP|HENHMETAFILE|HFILE|HFONT|HGDIOBJ|HGLOBAL|HHOOK|HICON|HINSTANCE|HKEY|HKL|HLOCAL|HMENU|HMETAFILE|HMODULE|HMONITOR|HPALETTE|HPEN|HRESULT|HRGN|HRSRC|HSZ|HWINSTA|HWND|INT|INT_PTR|INT8|INT16|INT32|INT64|LANGID|LCID|LCTYPE|LGRPID|LONG|LONGLONG|LONG_PTR|LONG32|LONG64|LPARAM|LPBOOL|LPBYTE|LPCOLORREF|LPCSTR|LPCTSTR|LPCVOID|LPCWSTR|LPDWORD|LPHANDLE|LPINT|LPLONG|LPSTR|LPTSTR|LPVOID|LPWORD|LPWSTR|LRESULT|PBOOL|PBOOLEAN|PBYTE|PCHAR|PCSTR|PCTSTR|PCWSTR|PDWORD|PDWORDLONG|PDWORD_PTR|PDWORD32|PDWORD64|PFLOAT|PHALF_PTR|PHANDLE|PHKEY|PINT|PINT_PTR|PINT8|PINT16|PINT32|PINT64|PLCID|PLONG|PLONGLONG|PLONG_PTR|PLONG32|PLONG64|POINTER_32|POINTER_64|POINTER_SIGNED|POINTER_UNSIGNED|PSHORT|PSIZE_T|PSSIZE_T|PSTR|PTBYTE|PTCHAR|PTSTR|PUCHAR|PUHALF_PTR|PUINT|PUINT_PTR|PUINT8|PUINT16|PUINT32|PUINT64|PULONG|PULONGLONG|PULONG_PTR|PULONG32|PULONG64|PUSHORT|PVOID|PWCHAR|PWORD|PWSTR|QWORD|SC_HANDLE|SC_LOCK|SERVICE_STATUS_HANDLE|SHORT|SIZE_T|SSIZE_T|TBYTE|TCHAR|UCHAR|UHALF_PTR|UINT|UINT_PTR|UINT8|UINT16|UINT32|UINT64|ULONG|ULONGLONG|ULONG_PTR|ULONG32|ULONG64|UNICODE_STRING|USHORT|USN|VOID|WCHAR|WINAPI|WORD|WPARAM)\b'
+  stdint_types: '\b(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)\b'
+  p_thread_types: '\b(pthread_attr_t|pthread_cond_t|pthread_condattr_t|pthread_mutex_t|pthread_mutexattr_t|pthread_once_t|pthread_rwlock_t|pthread_rwlockattr_t|pthread_t|pthread_key_t)\b'
+  c_sys_types: '\b(u_char|u_short|u_int|u_long|ushort|uint|u_quad_t|quad_t|qaddr_t|caddr_t|daddr_t|dev_t|fixpt_t|blkcnt_t|blksize_t|gid_t|in_addr_t|in_port_t|ino_t|key_t|mode_t|nlink_t|id_t|pid_t|off_t|segsz_t|swblk_t|uid_t|id_t|clock_t|size_t|ssize_t|time_t|useconds_t|suseconds_t|ptrdiff_t)\b'
+  mac_classic_types: '\b(AbsoluteTime|Boolean|Byte|ByteCount|ByteOffset|BytePtr|CompTimeValue|ConstLogicalAddress|ConstStrFileNameParam|ConstStringPtr|Duration|Fixed|FixedPtr|Float32|Float32Point|Float64|Float80|Float96|FourCharCode|Fract|FractPtr|Handle|ItemCount|LogicalAddress|OptionBits|OSErr|OSStatus|OSType|OSTypePtr|PhysicalAddress|ProcessSerialNumber|ProcessSerialNumberPtr|ProcHandle|Ptr|ResType|ResTypePtr|ShortFixed|ShortFixedPtr|SignedByte|SInt16|SInt32|SInt64|SInt8|Size|StrFileName|StringHandle|StringPtr|TimeBase|TimeRecord|TimeScale|TimeValue|TimeValue64|UInt16|UInt32|UInt64|UInt8|UniChar|UniCharCount|UniCharCountPtr|UniCharPtr|UnicodeScalarValue|UniversalProcHandle|UniversalProcPtr|UnsignedFixed|UnsignedFixedPtr|UnsignedWide|UTF16Char|UTF32Char|UTF8Char)\b'
+  storage_modifiers: '\b(appdomain|deprecated|dllimport|dllexport|jintrinsic|naked|noalias|noinline|noreturn|nothrow|novtable|process|restrict|safebuffers|selectany|thread)\b'
+  operator_keywords: '\b(and|and_eq|bitand|bitor|compl|not|not_eq|or|or_eq|xor|xor_eq|noexcept)\b'
+
+
+
+contexts:
+  main:
+    - include: comments
+
+    - include: keywords
+
+    - include: function_definition
+    - include: templates
+
+    - include: expression
+    - include: operators
+
+    - include: classes_etc
+
+    - include: preprocessor
+
+
+
+  #########################################################
+  # comments
+
+
+  comments:
+    - include: line_comment
+    - include: multi_line_comment
+    
+
+  line_comment:
+    - match: '//'
+      scope: punctuation.definition.comment.cpp2
+      push:
+        - meta_scope: comment.line.cpp2
+        - match: '\n'
+          pop: true
+
+  multi_line_comment:
+    - match: '/\*'
+      scope: punctuation.definition.comment.cpp2
+      push:
+        - meta_scope: comment.multiline.cpp2
+        - match: '\*/'
+          pop: true
+
+
+
+
+
+  #########################################################
+  # preprocessor
+
+  preprocessor:
+    - include: preprocessor_include
+    - include: preprocessor_define
+    - include: preprocessor_other
+    - match: '\b(_Pragma)\b'
+
+
+  preprocessor_include:
+    - match: ^\s*(#\s*(?:include))\b
+      scope: keyword.control.import.include.cpp2
+      push:
+        - match: '<'
+          scope: punctuation.definition.string.begin.cpp2
+          push:
+            - meta_scope: string.quoted.other.lt-gt.include.cpp2
+            - match: '>'
+              scope: punctuation.definition.string.end.cpp2
+              pop: 2
+        - match: '"'
+          scope: punctuation.definition.string.begin.cpp2
+          push:
+            - meta_scope: string.quoted.double.include.cpp2
+            - match: '"'
+              scope: punctuation.definition.string.end.cpp2
+              pop: 2
+
+
+  preprocessor_define:
+    - match: ^\s*(#\s*(?:define))\b
+      scope: keyword.control.preprocessor.cpp2
+      # push:
+      #   - match: '{{identifier}}'
+      #     scope: variable.preprocessor.define.cpp2
+      #   - match: '{{newline}}'
+      #     pop: true
+
+
+  preprocessor_other:
+    - match: ^\s*(#\s*(?:pragma|if|ifdef|ifndef|else|elif|endif|undef|line))\b
+      scope: keyword.control.preprocessor.cpp2
+      push:
+        - match: ''
+          scope: variable.cpp2
+          push:
+            - match: '{{newline}}'
+              pop: 3
+
+
+
+
+  #########################################################
+  # operators
+
+  operators:
+    - include: assignment_operator
+    - include: accessor_operator
+    - include: declaration_operators
+    - include: arithmetic_operators
+    - include: bitwise_operators
+    - include: logical_operators
+    - include: operator_keywords
+    - include: misc_operators
+
+
+  assignment_operator:
+    - match: '\='
+      scope: keyword.operator.assignment.cpp2
+    - match: \+\=|-\=|\*\=|/\=|%\=|&\=|\|\=|\^\=|>>\=|<<\=
+      scope: keyword.operator.assignment.augmented.cpp2
+
+  accessor_operator:
+    - match: '(::|\.)'
+      scope: punctuation.accessor.cpp2
+
+  declaration_operators:
+    - match: '(->|:)'
+      scope: keyword.operator.declaration.cpp2
+
+  arithmetic_operators:
+    - match: '((\+)|(\-)|(\*)|(\/)|(%))'
+      scope: keyword.operator.arithmetic.cpp2
+
+  bitwise_operators:
+    - match: '(>>)|(<<)|(&)|(\|)'
+      scope: keyword.operator.bitwise.cpp2
+
+  logical_operators:
+    # templates
+    - match: '(?=<((({{namespace_identifier}}{{identifier}}|[0-9])*),(\s*))*(({{namespace_identifier}}{{identifier}}|[0-9])*)>)'
+      push:
+        - match: '<'
+          scope: punctuation.cpp2
+        
+        - include: types
+        - include: literals
+        - include: comma
+
+        - match: '>'
+          scope: punctuation.cpp2
+          pop: 1
+
+    - match: '(((>=)|(<=)|(=>)|(=<)|(==)|>|<|(&&)|(\|\|)|\!=|\!))'
+      scope: keyword.operator.logical.cpp2
+
+  operator_keywords:
+    - match: '\b({{operator_keywords}})\b'
+      scope: keyword.operator.cpp2    
+
+  misc_operators:
+    - match: '\.\.\.'
+      scope: keyword.operator.variadic.cpp2
+    - match: '\$'
+      scope: keyword.operator.cpp2
+    - match: '\?|:(?!:)'
+      scope: keyword.operator.ternary.cpp2
+
+
+
+  #########################################################
+  # literals
+
+
+  literals:
+    - include: literal_string
+    - include: literal_char
+    - include: literal_bool
+    - include: literal_numbers
+
+
+  literal_string:
+    - match: '"'
+      scope: punctuation.definition.string.begin.cpp2
+      push:
+        - meta_scope: string.quoted.double.cpp2
+        - match: '(\\(n|r|0|t|?|a|b|f|v|\\))'
+          scope: constant.character.escape.cpp2
+        - match: '"'
+          scope: punctuation.definition.string.end.cpp2
+          pop: true
+
+  literal_char:
+    - match: \'
+      scope: punctuation.definition.string.begin.cpp2
+      push:
+        - meta_scope: string.quoted.single.cpp2
+        - match: '(\\(n|r|0|t|?|a|b|f|v|\\))'
+          scope: constant.character.escape.cpp2
+        - match: \'
+          scope: punctuation.definition.string.end.cpp2
+          pop: true
+
+
+  literal_bool:
+    - match: '\b(true|false|TRUE|FALSE)\b'
+      scope: constant.language.cpp2
+
+
+
+  literal_value:
+    - match: '\b(nullptr|NULL)\b'
+      scope: constant.language.cpp2
+
+
+
+  # literal numbers code was adapted from Sublime's default c++ syntax highlighting
+
+  literal_numbers:
+    - include: literal_decimal_floats
+    - include: literal_hex_float
+    - include: literal_hex_int
+    - include: literal_binary
+    - include: literal_octal_int
+    - include: literal_decimal_int
+  
+  literal_decimal_floats:
+    - match: |-
+        (?x:
+          \b({{dec_digits}})
+          (?:
+            ( (\.)
+              (?:
+                # 1.1, 1.1e1, 1.1e-1, 1.1f, 1.1e1f, 1.1e-1f, 1.1L, 1.1e1L, 1.1e-1L
+                {{dec_digit}}+ {{dec_exponent}}?
+                # 1.e1, 1.e-1, 1.e1f, 1.e-1f, 1.e1L, 1.e-1L
+                | {{dec_exponent}}
+                # 1., 1.f, 1.L # but not `..`
+                | (?!\.)
+              )
+              # 1e1 1e1f 1e1L
+              | {{dec_exponent}}
+            ) ({{dec_suffix}})?
+            # 1f
+            | ({{float_suffix}})
+          )
+          # .1, .1e1, .1e-1, .1f, .1e1f, .1e-1f, .1L, .1e1L, .1e-1L
+          | ( (\.) {{dec_digit}}+ {{dec_exponent}}? ) ({{dec_suffix}})?
+        )
+      scope: constant.numeric.scientific.cpp2
+
+  literal_hex_float:
+    - match: \b(0[xX])({{hex_digit}}*(\.){{hex_digit}}*{{hex_exponent}})({{dec_suffix}})?
+      scope: meta.number.float.hexadecimal.cpp2
+      captures:
+        1: constant.numeric.base.cpp2
+        2: constant.numeric.value.cpp2
+        3: punctuation.separator.decimal.cpp2
+        4: constant.numeric.suffix.cpp2
+
+
+  literal_hex_int:
+    - match: \b(0[xX])({{hex_digit}}*)({{hex_suffix}})?
+      scope: meta.number.integer.hexadecimal.cpp2
+      captures:
+        1: constant.numeric.base.cpp2
+        2: constant.numeric.value.cpp2
+        3: constant.numeric.suffix.cpp2
+
+  literal_binary:
+    - match: \b(0[bB])({{bin_digit}}*)({{bin_suffix}})?
+      scope: meta.number.integer.binary.cpp2
+      captures:
+        1: constant.numeric.base.cpp2
+        2: constant.numeric.value.cpp2
+        3: constant.numeric.suffix.cpp2
+
+  literal_octal_int:
+    - match: \b(0)({{oct_digit}}+)({{oct_suffix}})?
+      scope: meta.number.integer.octal.cpp2
+      captures:
+        1: constant.numeric.base.cpp2
+        2: constant.numeric.value.cpp2
+        3: constant.numeric.suffix.cpp2
+
+  literal_decimal_int:
+    - match: \b({{dec_digits}})({{dec_suffix}})?
+      scope: meta.number.integer.decimal.cpp2
+      captures:
+        1: constant.numeric.value.cpp2
+        2: constant.numeric.suffix.cpp2
+
+
+  #########################################################
+  # keywords
+
+  keywords:
+    - include: conditional_keywords
+    - include: declarative_keywords
+    - include: functional_keywords
+    - include: param_modifier_keywords
+    - include: coroutine_keywords
+    - include: constexpr_keywords
+    - include: modifier_keywords
+    - include: is_as_keywords
+    - include: language_variables
+    - include: built_in_functions
+
+
+
+  conditional_keywords:
+    - match: '\b(if|else|switch|case|default)\b'
+      scope: keyword.control.conditional.cpp2
+
+
+  declarative_keywords:
+    - match: '\b(return|break|new|delete|yield|continue)\b'
+      scope: keyword.control.cpp2
+
+    - match: '\b(?=(public|private|protected):)\b'
+      push:
+        - match: '\b(public|private|protected)\b'
+          scope: keyword.control.cpp2
+        - match: ':'
+          soope: punctuation.cpp2
+          pop: true
+
+
+  functional_keywords:
+    - match: '\b(while|for|do|throw|catch|finally|goto)\b'
+      scope: keyword.control.functional.cpp2
+    - match: '\b(next)(?:[^\(])'
+      scope: keyword.control.functional.cpp2
+    - match: '\b(namespace)\s+(?={{namespace_identifier}}{{identifier}}\s*{)'
+      scope: keyword.control.functional.cpp2
+      push:
+        - match: '{{namespace_identifier}}'
+          scope: entity.name.namespace.cpp2
+        - match: '{{identifier}}'
+          scope: entity.name.namespace.cpp2
+          pop: true
+
+
+  param_modifier_keywords:
+    - match: '(?=[^:])(in|inout|out|copy|move|forward)\b'
+      scope: keyword.control.modifier.cpp2
+
+
+  coroutine_keywords:
+    - match: '\b(co_await|co_return|co_yield)\b'
+      scope: keyword.control.modifier.cpp2  
+
+  constexpr_keywords:
+    - match: '\b(constexpr|consteval|constinit)\b'
+      scope: keyword.control.modifier.cpp2
+
+  modifier_keywords:
+    - match: '\b(const|volatile|mutable|typename)\b'
+      scope: keyword.control.modifier.cpp2
+    - match: '\b(static|virtual|inline|restrict|extern|friend|explicit|register|thread_local|__restrict__|__restrict|{{storage_modifiers}})\b'
+      scope: keyword.control.modifier.cpp2
+
+
+  is_as:
+    - match: '\b(is|as)\b'
+      scope: keyword.control.cpp2
+
+  language_variables:
+    - match: '\b(this|_)\b'
+      scope: variable.language.cpp2
+
+
+  built_in_functions:
+    - match: '\b(static_assert|sizeof|typeid|decltype|alignof|alignas|__declspec|__attribute__)\b'
+      scope: keyword.control.cpp2
+    - match: '\b(static_cast|dynamic_cast|reinterpret_cast|const_cast)\b'
+      scope: keyword.control.cpp2
+
+
+
+  #########################################################
+  # types
+
+
+  types:
+    - include: number_types
+    - include: char_types
+    - include: type_modifiers
+    - include: asm_types
+    - include: boolean_types
+    - include: misc_types
+
+
+
+  number_types:
+    - match: '\b({{numeric_type}})\b'
+      scope: storage.type.number.cpp2
+
+  char_types:
+    - match: '\b(char8_t|char16_t|char32_t|wchar_t|nullptr_t)\b'
+      scope: storage.type.char.cpp2
+
+  type_modifiers:
+    - match: '\b(signed|unsigned)\b'
+      scope: storage.type.modifier.cpp2
+
+
+  asm_types:
+    - match: '\b({{asm_type}})\b'
+      scope: storage.type.asm.cpp2
+
+  boolean_types:
+    - match: '\b({{boolean_type}})\b'
+      scope: storage.type.boolean.cpp2
+
+
+  misc_types:
+    - match: '\b({{microsoft_types}}|{{windows_types}}|{{stdint_types}}|{{p_thread_types}}|{{c_sys_types}}|{{mac_classic_types}}|{{misc_type}})\b'
+      scope: storage.type.cpp2
+
+
+
+  #########################################################
+  # expressions
+
+  expression:
+    - include: built_in_variables
+    - include: function_call
+    - include: literals
+    - include: types
+    - include: operators
+    - match: '{{identifier}}(?=\s*[,|\)])'
+      scope: variable.cpp2
+
+
+  #########################################################
+  # functions
+
+  function_call:
+    - match: '{{identifier}}((\s)*?)(?=\()'
+      scope: variable.function.cpp2
+      push:
+        - match: '\('
+          scope: punctuation.section.parens.begin.cpp2
+
+        - include: param_modifier_keywords
+        - include: expression
+        - include: comma
+        
+        - match: \)
+          scope: punctuation.section.parens.end.cpp2
+          pop: true
+
+
+  comma:
+    - match: ','
+      scope: punctuation.separator.comma.cpp2
+
+  param:
+    - match: '\b(in|inout|out|copy|move|forward)\b'
+      scope: keyword.other.cpp2
+
+
+  function_definition:
+    - match: '(?=\b\s{{namespace_identifier}}{{identifier}}\()'
+      push:
+        - include: types
+        - match: '{{identifier}}'
+          scope: entity.name.function.cpp2
+        - match: '\('
+          pop: true
+
+    - match: '(?={{namespace_identifier}}{{identifier}}:(\s)*\()'
+      push:
+        - match: '{{identifier}}'
+          scope: entity.name.function.cpp2
+          pop: true
+
+  templates:
+    - match: '\b(template)\b'
+      scope: keyword.declaration.template.cpp2
+
+
+
+  #########################################################
+  # classes and structs
+
+
+  classes_etc:
+    - include: classes_and_structs
+    - include: destructor_call
+    - include: enums_unions
+    - include: using
+
+  classes_and_structs:
+    - match: '\b(class|struct)\b'
+      scope: keyword.declaration.class.cpp2
+      push:
+        - match: '\b({{namespace_identifier}})\b'
+          scope: variable.namespace.cpp2
+        - match: '\b({{identifier}})\b'
+          scope: entity.name.class.cpp2
+          pop: true
+
+  destructor_call:
+    - match: '~{{identifier}}((\s)*?)(?=\()'
+      scope: entity.name.destructor.cpp2
+
+  enums_unions:
+    - match: '\b(enum|union)\b'
+      scope: keyword.declaration.enum.cpp2
+      push:
+        - match: '\b({{namespace_identifier}})\b'
+          scope: variable.namespace.cpp2
+        - match: '\b({{identifier}})\b'
+          scope: entity.name.enum.cpp2
+          pop: true
+
+
+  using:
+    - match: '\b(using)\b'
+      scope: keyword.control.cpp2
+      push:
+        - match: '{{identifier}}'
+          scope: entity.name.cpp2
+          pop: true
+
