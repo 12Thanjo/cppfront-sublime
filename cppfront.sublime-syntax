@@ -168,7 +168,9 @@ contexts:
 
 
   preprocessor_other:
-    - match: ^\s*(#\s*(?:pragma|if|ifdef|ifndef|else|elif|endif|undef|line))\b
+    - match: ^\s*(#\s*(?:endif))\b
+      scope: keyword.control.preprocessor.cpp2
+    - match: ^\s*(#\s*(?:pragma|if|ifdef|ifndef|else|elif|undef|line))\b
       scope: keyword.control.preprocessor.cpp2
       push:
         - match: ''
@@ -176,8 +178,6 @@ contexts:
           push:
             - match: '{{newline}}'
               pop: 3
-
-
 
 
   #########################################################
@@ -205,8 +205,16 @@ contexts:
       scope: punctuation.accessor.cpp2
 
   declaration_operators:
-    - match: '(->|:)'
+    - match: '(->)'
       scope: keyword.operator.declaration.cpp2
+    - match: '(?=:)'
+      push:
+        - match: '(\b)*(?<=(?:do|private|public|protected))(:)'
+          scope: punctuation.cpp2
+          pop: true
+        - match: '(:)'
+          scope: keyword.operator.declaration.cpp2
+          pop: true
 
   arithmetic_operators:
     - match: '((\+)|(\-)|(\*)|(\/)|(%))'
@@ -264,7 +272,7 @@ contexts:
       scope: punctuation.definition.string.begin.cpp2
       push:
         - meta_scope: string.quoted.double.cpp2
-        - match: '(\\(n|r|0|t|?|a|b|f|v|\\))'
+        - match: '(\\(n|r|0|t|\?|a|b|f|v|\\|"))'
           scope: constant.character.escape.cpp2
         - match: '"'
           scope: punctuation.definition.string.end.cpp2
@@ -275,7 +283,7 @@ contexts:
       scope: punctuation.definition.string.begin.cpp2
       push:
         - meta_scope: string.quoted.single.cpp2
-        - match: '(\\(n|r|0|t|?|a|b|f|v|\\))'
+        - match: '(\\(n|r|0|t|\?|a|b|f|v|\\))'
           scope: constant.character.escape.cpp2
         - match: \'
           scope: punctuation.definition.string.end.cpp2
@@ -382,7 +390,7 @@ contexts:
     - include: coroutine_keywords
     - include: constexpr_keywords
     - include: modifier_keywords
-    - include: is_as_keywords
+    - include: type_keywords
     - include: language_variables
     - include: built_in_functions
 
@@ -422,7 +430,7 @@ contexts:
 
 
   param_modifier_keywords:
-    - match: '(?=[^:])(in|inout|out|copy|move|forward)\b'
+    - match: '\b(?=[^:])(in|inout|out|copy|move|forward)\b'
       scope: keyword.control.modifier.cpp2
 
 
@@ -437,12 +445,12 @@ contexts:
   modifier_keywords:
     - match: '\b(const|volatile|mutable|typename)\b'
       scope: keyword.control.modifier.cpp2
-    - match: '\b(static|virtual|inline|restrict|extern|friend|explicit|register|thread_local|__restrict__|__restrict|{{storage_modifiers}})\b'
+    - match: '\b(static|virtual|inline|restrict|extern|explicit|register|thread_local|__restrict__|__restrict|{{storage_modifiers}})\b'
       scope: keyword.control.modifier.cpp2
 
 
-  is_as:
-    - match: '\b(is|as)\b'
+  type_keywords:
+    - match: '\b(is|as|inspect)\b'
       scope: keyword.control.cpp2
 
   language_variables:
@@ -504,10 +512,12 @@ contexts:
   # expressions
 
   expression:
+    - include: comments
     - include: built_in_variables
     - include: function_call
     - include: literals
     - include: types
+    - include: keywords
     - include: operators
     - match: '{{identifier}}(?=\s*[,|\)])'
       scope: variable.cpp2
@@ -517,7 +527,7 @@ contexts:
   # functions
 
   function_call:
-    - match: '{{identifier}}((\s)*?)(?=\()'
+    - match: '(?=\b(\s*)){{identifier}}((\s)*?)(?=\()'
       scope: variable.function.cpp2
       push:
         - match: '\('
@@ -542,7 +552,14 @@ contexts:
 
 
   function_definition:
-    - match: '(?=\b\s{{namespace_identifier}}{{identifier}}\()'
+    - match: '(?=\b\s{{namespace_identifier}}{{identifier}}\(.*?\)\s*?->)'
+      push:
+        - include: types
+        - match: '{{identifier}}'
+          scope: entity.name.function.cpp2
+        - match: '\('
+          pop: true
+    - match: '(?=\b\s{{namespace_identifier}}{{identifier}}\(.*?\))'
       push:
         - include: types
         - match: '{{identifier}}'
@@ -570,7 +587,7 @@ contexts:
     - include: classes_and_structs
     - include: destructor_call
     - include: enums_unions
-    - include: using
+    - include: using_and_friend
 
   classes_and_structs:
     - match: '\b(class|struct)\b'
@@ -578,9 +595,23 @@ contexts:
       push:
         - match: '\b({{namespace_identifier}})\b'
           scope: variable.namespace.cpp2
+        - match: '\b({{identifier}})\b(\s)*?(?=\:)'
+          scope: entity.name.class.cpp2
+          push:
+            - match: ':'
+              scope: punctuation.cpp2
+            - match: '\b(public|private)\b'
+              scope: keyword.control.cpp2
+            - match: '\b({{namespace_identifier}})\b'
+              scope: variable.namespace.cpp2
+            - match: '\b({{identifier}})\b'
+              scope: entity.name.class.cpp2
+              pop: 2
         - match: '\b({{identifier}})\b'
           scope: entity.name.class.cpp2
           pop: true
+
+
 
   destructor_call:
     - match: '~{{identifier}}((\s)*?)(?=\()'
@@ -597,8 +628,8 @@ contexts:
           pop: true
 
 
-  using:
-    - match: '\b(using)\b'
+  using_and_friend:
+    - match: '\b(using|friend)\b'
       scope: keyword.control.cpp2
       push:
         - match: '{{identifier}}'
