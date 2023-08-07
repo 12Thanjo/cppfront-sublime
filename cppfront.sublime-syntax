@@ -76,8 +76,9 @@ variables:
   c_sys_types: '\b(u_char|u_short|u_int|u_long|ushort|uint|u_quad_t|quad_t|qaddr_t|caddr_t|daddr_t|dev_t|fixpt_t|blkcnt_t|blksize_t|gid_t|in_addr_t|in_port_t|ino_t|key_t|mode_t|nlink_t|id_t|pid_t|off_t|segsz_t|swblk_t|uid_t|id_t|clock_t|size_t|ssize_t|time_t|useconds_t|suseconds_t|ptrdiff_t)\b'
   mac_classic_types: '\b(AbsoluteTime|Boolean|Byte|ByteCount|ByteOffset|BytePtr|CompTimeValue|ConstLogicalAddress|ConstStrFileNameParam|ConstStringPtr|Duration|Fixed|FixedPtr|Float32|Float32Point|Float64|Float80|Float96|FourCharCode|Fract|FractPtr|Handle|ItemCount|LogicalAddress|OptionBits|OSErr|OSStatus|OSType|OSTypePtr|PhysicalAddress|ProcessSerialNumber|ProcessSerialNumberPtr|ProcHandle|Ptr|ResType|ResTypePtr|ShortFixed|ShortFixedPtr|SignedByte|SInt16|SInt32|SInt64|SInt8|Size|StrFileName|StringHandle|StringPtr|TimeBase|TimeRecord|TimeScale|TimeValue|TimeValue64|UInt16|UInt32|UInt64|UInt8|UniChar|UniCharCount|UniCharCountPtr|UniCharPtr|UnicodeScalarValue|UniversalProcHandle|UniversalProcPtr|UnsignedFixed|UnsignedFixedPtr|UnsignedWide|UTF16Char|UTF32Char|UTF8Char)\b'
   storage_modifiers: '\b(appdomain|deprecated|dllimport|dllexport|jintrinsic|naked|noalias|noinline|noreturn|nothrow|novtable|process|restrict|safebuffers|selectany|thread)\b'
-  operator_keywords: '\b(and|and_eq|bitand|bitor|compl|not|not_eq|or|or_eq|xor|xor_eq|noexcept)\b'
+  operator_keywords: '\b(and|and_eq|bitand|bitor|compl|not|not_eq|or|or_eq|xor|xor_eq|noexcept|operator)\b'
 
+  type_decorator_keywords: '(@(interface|polymorphic_base|ordered|weakly_ordered(?:_value)|partially_ordered(?:_value)|struct|value))'
 
 
 contexts:
@@ -92,9 +93,10 @@ contexts:
     - include: expression
     - include: operators
 
+    - include: preprocessor
+
     - include: classes_etc
 
-    - include: preprocessor
 
 
 
@@ -244,12 +246,12 @@ contexts:
 
   operator_keywords:
     - match: '\b({{operator_keywords}})\b'
-      scope: keyword.operator.cpp2    
+      scope: keyword.operator.cpp2
 
   misc_operators:
     - match: '\.\.\.'
       scope: keyword.operator.variadic.cpp2
-    - match: '\$'
+    - match: '(\$)'
       scope: keyword.operator.cpp2
     - match: '\?|:(?!:)'
       scope: keyword.operator.ternary.cpp2
@@ -268,6 +270,30 @@ contexts:
 
 
   literal_string:
+    - match: '((u|u8|U|L)??R)(?="\()'
+      scope: keyword.cpp2
+      push:
+        - match: '"\('
+          scope: punctuation.definition.string.begin.cpp2
+          push:
+            - meta_scope: string.quoted.double.cpp2
+            - match: '(\\(n|r|0|t|\?|a|b|f|v|\\|"))'
+              scope: constant.character.escape.cpp2
+            - match: '\)"'
+              scope: punctuation.definition.string.end.cpp2
+              pop: 2
+    - match: '(u|u8|U|L)(?=")'
+      scope: keyword.cpp2
+      push:
+        - match: '"'
+          scope: punctuation.definition.string.begin.cpp2
+          push:
+            - meta_scope: string.quoted.double.cpp2
+            - match: '(\\(n|r|0|t|\?|a|b|f|v|\\|"))'
+              scope: constant.character.escape.cpp2
+            - match: '"'
+              scope: punctuation.definition.string.end.cpp2
+              pop: 2
     - match: '"'
       scope: punctuation.definition.string.begin.cpp2
       push:
@@ -427,10 +453,22 @@ contexts:
         - match: '{{identifier}}'
           scope: entity.name.namespace.cpp2
           pop: true
+    - match: '\b(?={{namespace_identifier}}{{identifier}}:((\s)*?)(namespace))\b'
+      push:
+        - match: '\b({{namespace_identifier}})\b'
+          scope: variable.namespace.cpp2
+        - match: '{{identifier}}'
+          scope: entity.name.namespace.cpp2
+          push:
+            - match: ':'
+              scope: keyword.operator.declaration.cpp2
+            - match: '\b(namespace)\b'
+              scope: keyword.control.functional.cpp2
+              pop: 2
 
 
   param_modifier_keywords:
-    - match: '\b(?=[^:])(in|inout|out|copy|move|forward)\b'
+    - match: '\b(?=[^:])(in|implicit|inout|out|copy|move|forward)\b'
       scope: keyword.control.modifier.cpp2
 
 
@@ -445,7 +483,7 @@ contexts:
   modifier_keywords:
     - match: '\b(const|volatile|mutable|typename)\b'
       scope: keyword.control.modifier.cpp2
-    - match: '\b(static|virtual|inline|restrict|extern|explicit|register|thread_local|__restrict__|__restrict|{{storage_modifiers}})\b'
+    - match: '\b(requires|final|static|virtual|inline|restrict|extern|explicit|register|thread_local|__restrict__|__restrict|{{storage_modifiers}})\b'
       scope: keyword.control.modifier.cpp2
 
 
@@ -559,7 +597,7 @@ contexts:
           scope: entity.name.function.cpp2
         - match: '\('
           pop: true
-    - match: '(?=\b\s{{namespace_identifier}}{{identifier}}\(.*?\))'
+    - match: '(?=\b\s{{namespace_identifier}}{{identifier}}\(.*?\)\s*?\{)'
       push:
         - include: types
         - match: '{{identifier}}'
@@ -586,6 +624,7 @@ contexts:
   classes_etc:
     - include: classes_and_structs
     - include: destructor_call
+    - include: type_declaration
     - include: enums_unions
     - include: using_and_friend
 
@@ -611,6 +650,56 @@ contexts:
           scope: entity.name.class.cpp2
           pop: true
 
+
+  type_declaration:
+    - match: (?=.)
+      push:
+        - match: '\b(?={{namespace_identifier}}{{identifier}}:((\s)*?)(final)((\s)*?)(type))\b'
+          push:
+            - match: '\b({{namespace_identifier}})\b'
+              scope: variable.namespace.cpp2
+            - match: '{{identifier}}'
+              scope: entity.name.type.cpp2
+              push:
+                - match: ':'
+                  scope: keyword.operator.declaration.cpp2
+                - match: '{{type_decorator_keywords}}'
+                  scope: keyword.operator.declaration.cpp2
+                - match: '\b(final)\b'
+                  scope: keyword.operator.declaration.cpp2
+                - match: '\b(type)\b'
+                  scope: keyword.declaration.type.cpp2
+                - match: '((\s)*?)='
+                  scope: keyword.operator.declaration.cpp2
+                  pop: 4
+        - match: '\b(?={{namespace_identifier}}{{identifier}}((\s)*?):((\s)*?)(type))\b'
+          push:
+            - match: '\b({{namespace_identifier}})\b'
+              scope: variable.namespace.cpp2
+            - match: '{{identifier}}'
+              scope: entity.name.type.cpp2
+              push:
+                - match: '\b(type)\b'
+                  scope: keyword.declaration.type.cpp2
+                - match: '((\s)*?)='
+                  scope: keyword.operator.declaration.cpp2
+                  pop: 4
+        - match: '\b(?={{namespace_identifier}}{{identifier}}((\s)*?):((\s)*?){{type_decorator_keywords}})\b'
+          push:
+            - match: '\b({{namespace_identifier}})\b'
+              scope: variable.namespace.cpp2
+            - match: '{{identifier}}'
+              scope: entity.name.type.cpp2
+              push:
+                - match: ':'
+                  scope: keyword.operator.declaration.cpp2
+                - match: '{{type_decorator_keywords}}'
+                  scope: keyword.operator.declaration.cpp2
+                - match: '\b(type)\b'
+                  scope: keyword.declaration.type.cpp2
+                  pop: 4
+        - match: (?=.)
+          pop: true
 
 
   destructor_call:

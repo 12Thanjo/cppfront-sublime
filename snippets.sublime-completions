@@ -1,0 +1,102 @@
+{"scope":"source.cpp2","completions":[
+	
+	{
+		"trigger":"if",
+		"contents":"if $1 {\n\t$2\n}",
+		"annotation":"if statement",
+		"kind":"snippet"
+	},
+
+	{
+		"trigger":"else",
+		"contents":"else {\n\t$2\n}",
+		"annotation":"else statement",
+		"kind":"snippet"
+	},
+
+
+
+
+	{
+		"trigger":"for",
+		"contents":"for $1 {\n\t$2\n}",
+		"annotation":"for statement",
+		"kind":"snippet"
+	},
+
+	{
+		"trigger":"whi",
+		"contents":"while $1 {\n\t$2\n}",
+		"annotation":"while statement",
+		"kind":"snippet"
+	},
+
+
+
+
+
+	{
+		"trigger":"func",
+		"contents":"$1: ($2) -> ${3:int} = {\n\t$4\n}",
+		"annotation":"function declaration",
+		"kind":"snippet"
+	},
+
+
+	{
+		"trigger":"funcv",
+		"contents":"$1: ($2) = {\n\t$3\n}",
+		"annotation":"function declaration (void return type)",
+		"kind":"snippet"
+	},
+
+
+
+	{
+		"trigger":"str",
+		"contents":"struct $1 {\n\t$2\n};",
+		"annotation":"struct definition",
+		"kind":"snippet"
+	},
+
+	{
+		"trigger":"cls",
+		"contents":"class $1 {\n\t$2\n};",
+		"annotation":"class definition",
+		"kind":"snippet"
+	},
+
+	{
+		"trigger":"enc",
+		"contents":"enum class $1 {\n\t$2\n};",
+		"annotation":"enum class definition",
+		"kind":"snippet"
+	},
+
+
+	{
+		"trigger":"type",
+		"contents":"$1 : type = {\n\t$2\n}",
+		"annotation":"type definition",
+		"kind":"snippet"
+	},
+
+
+	{
+		"trigger":"otype",
+		"contents":"$1 : @$2 type = {\n\t$3\n}",
+		"annotation":"ornamented type definition",
+		"kind":"snippet"
+	},
+
+
+	{
+		"trigger":"name",
+		"contents":"$1: namespace = {\n\t$2\n}",
+		"annotation":"namespace",
+		"kind":"snippet"
+	},
+
+
+
+]}

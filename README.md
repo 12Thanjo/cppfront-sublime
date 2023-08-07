@@ -2,7 +2,7 @@
 
 This is my implementation of syntax highlighting for Herb Sutter's [cppfront](https://github.com/hsutter/cppfront) project.
 
-This implementation is intended for use in Sublime 4. Both cppfront and C++ code are supported.
+This implementation is intended for use in Sublime 4. Both cppfront and C++ syntaxes are supported.
 
 
 ### Installation:
@@ -13,11 +13,11 @@ This implementation is intended for use in Sublime 4. Both cppfront and C++ code
 	- Preferences > Browse Packages
 3) Create `User` directory if not already created
 4) Insert the repo anywhere in this `User` directory, including sub-directories
-5) A restart may be required, but otherwise you are good to go!
+5) A restart of the Submlime may be required, but otherwise you should be good to go!
 
 
 ### Snippets:
-Snippets are intended to be included at some point. I'm not sure when (I'm sadly quite slow at the moment), but hopefully soon.
+I have also created some snippets, and attemted to copy the code format style found in the [cppfront test files](https://github.com/hsutter/cppfront/tree/main/regression-tests).
 
 
 ### Support:
